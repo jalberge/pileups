@@ -1,23 +1,110 @@
 import wolf
 
-class task1(wolf.Task):
-    name = <task name>
+samtools_docker = "jbalberge/samtools_cloud:1.20"
+
+
+class Maf2VcfPositions(wolf.Task):
+    name = "Maf2VcfPositions"
+    inputs = {"mafs": None, "n_var": 250, "n_max": 0}
+    script = """
+
+set -euxo pipefail
+
+# use n_max>0 for test purposes
+
+# SBS only for now
+# mafs is a list of maf files!
+# first extract positions; sort; dedup; split
+
+xargs cut -f5,6,11,13 < $mafs | \
+    awk -v OFS="\t" '$3 ~ /^[ACGT]$/ && $4 ~ /^[ACGT]$/ | \
+    sort -k1,2 -V | \
+    uniq > master
+
+if [[ $n_max -gt 0 ]]; then head -n $n_max master > master_ && mv master_ master; fi
+
+split -l $n_var -a 5 -d --additional-suffix=.txt master variants_
+    
+    """
+    outputs = {
+        "variants": "variants_*.txt",
+    }
+    docker = samtools_docker
+
+
+class MpileupBams(wolf.Task):
+    name = "MpileupBams"
     inputs = {
-      "arg1" : <default_task_arg1>, # set to None for required arguments
-      "arg2" : <default_task_arg2>,
-      ...
+        "bams": None,
+        "samples": None,
+        "fasta": None,
+        "fasta_index": None,
+        "fasta_dict": None,
+        "variants_txt": None
     }
     script = """
-      # bash script goes here!
-      # $arg1 and $arg2 are available as variables to use, e.g.
-      echo ${arg1} ${arg2}
-      """
+export GCS_OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
+
+set -euxo pipefail
+
+shard=$(basename $variants_txt .txt)
+
+# prepare dummy vcf header
+# also extract the positions for mpileup / view streams
+echo -e "##fileformat=VCFv4.3" > variants.vcf
+echo -e "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO" >> variants.vcf
+awk -v OFS="\t" '{print $1,$2,".",$3,$4,".",".","."}' $variants_txt >> variants.vcf
+bgzip variants.vcf
+tabix -p vcf variants.vcf.gz
+
+# extract positions to stream bam
+cut -f1,2 $variants_txt > positions.txt
+
+# convert file to list of bams
+bam_list=$(cat $bams | tr "\n" " ")
+
+# mpileup depth and t_alt_count
+# norm to split multi allele
+bcftools mpileup -a FORMAT/AD,FORMAT/DP -A -d 30 -R positions.txt --ignore-RG -I -f $fasta $bam_list | \
+    bcftools norm -m - --write-index -o bcfpiles.vcf.gz
+# isec to intersect with master list of variants (keep only ALT allele and exclude *)
+bcftools isec -c none -p . -n=2 -w1  bcfpiles.vcf.gz variants.vcf.gz
+
+mv 0000.vcf ${shard}_isec.vcf
+
+"""
     outputs = {
-      "output1" : "<output1 pattern>",
-      "output2" : "<output2 pattern>",
-      ...
+        "isec_vcf": "*_isec.vcf"
     }
-    docker = "gcr.io/broad-getzlab-workflows/<container name>:<container version>"
-    resources = { "mem" : "1G" }
+    docker = samtools_docker
+    resources = {"mem": "8G"}  # mpileup 1.20 is not really parallelized. just compression vcf.
+
 
 # define additional tasks in the same way that task1 is defined above.
+
+class ConcatVcfsToMatrix(wolf.Task):
+    name = "ConcatVcfsToMatrix"
+    inputs = {
+        "isec_vcfs": None
+    }
+    script = """
+    set -exuo pipefail
+
+bcftools concat -f $isec_vcfs -o concat_0000.vcf
+
+    # query to transform VCF to MTX
+bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%AD{1}\t]' concat_0000.vcf > AD.txt
+bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%DP\t]' concat_0000.vcf > DP.txt
+bcftools query -l concat_0000.vcf > samples.txt
+
+cat ${samples} | tr "\n" "\t" > header
+
+awk '1' header DP.txt  > ${shard}_final_dp.txt
+awk '1' header AD.txt  > ${shard}_final_ad.txt      
+    """
+    outputs = {
+        "samples": "samples.txt",
+        "tumor_allele_depth": "*_final_ad.txt",
+        "total_depth": "*_final_dp.txt"
+    }
+    docker = samtools_docker
