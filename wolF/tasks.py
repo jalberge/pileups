@@ -17,7 +17,7 @@ set -euxo pipefail
 # first extract positions; sort; dedup; split
 
 xargs cut -f5,6,11,13 < $mafs | \
-    awk -v OFS="\t" '$3 ~ /^[ACGT]$/ && $4 ~ /^[ACGT]$/ | \
+    awk -v OFS="\t" '$3 ~ /^[ACGT]$/ && $4 ~ /^[ACGT]$/' | \
     sort -k1,2 -V | \
     uniq > master
 
