@@ -73,6 +73,9 @@ bcftools isec -c none -p . -n=2 -w1  bcfpiles.vcf.gz variants.vcf.gz
 
 mv 0000.vcf ${shard}_isec.vcf
 
+# clean indexes asap
+# TODO find a way to link the indexes
+rm *.bai
 """
     outputs = {
         "isec_vcf": "*_isec.vcf"

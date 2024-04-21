@@ -1,3 +1,5 @@
+import prefect
+
 from .tasks import *
 
 
@@ -11,6 +13,10 @@ def forcecall_mafs(mafs,
                    fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
                    bucket=None
                    ):
+    @prefect.task
+    def sort(x):
+        return sorted(x)
+
     ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
     variants_lists = Maf2VcfPositions(inputs={
         "mafs": [mafs], "n_var": n_var, "n_max": n_max
@@ -21,7 +27,7 @@ def forcecall_mafs(mafs,
         "fasta": ref_disk["fasta"],
         "fasta_index": ref_disk["fasta_index"],
         "fasta_dict": ref_disk["fasta_dict"],
-        "variants_txt": variants_lists["variants"]
+        "variants_txt": sort(variants_lists["variants"])
     })
     ad_dp_matrices = ConcatVcfsToMatrix(inputs={"isec_vcfs": [piles["isec_vcf"]]})
     if bucket is not None:
