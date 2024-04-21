@@ -21,7 +21,7 @@ xargs cut -f5,6,11,13 < $mafs | \
     sort -k1,2 -V | \
     uniq > master
 
-if [[ $n_max -gt 0 ]]; then head -n $n_max master > master_ && mv master_ master; fi
+if [[ $n_max -gt 0 ]]; then shuf -n $n_max master | sort -k1,2 -V > master_ && mv master_ master; fi
 
 split -l $n_var -a 5 -d --additional-suffix=.txt master variants_
     
