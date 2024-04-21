@@ -42,6 +42,7 @@ class MpileupBams(wolf.Task):
         "fasta_dict": None,
         "variants_txt": None
     }
+    overrides = { "bams": "string" }
     script = """
 export GCS_OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
 
