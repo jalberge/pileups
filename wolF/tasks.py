@@ -78,7 +78,7 @@ mv 0000.vcf ${shard}_isec.vcf
         "isec_vcf": "*_isec.vcf"
     }
     docker = samtools_docker
-    resources = {"mem": "8G"}  # mpileup 1.20 is not really parallelized. just compression vcf.
+    #resources = {"mem": "8G"}  # mpileup 1.20 is not really parallelized. just compression vcf.
 
 
 # define additional tasks in the same way that task1 is defined above.
@@ -98,14 +98,14 @@ bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%AD{1}\t]' concat_0000.vcf > AD.tx
 bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%DP\t]' concat_0000.vcf > DP.txt
 bcftools query -l concat_0000.vcf > samples.txt
 
-cat ${samples} | tr "\n" "\t" > header
+cat samples.txt | tr "\n" "\t" > header
 
-awk '1' header DP.txt  > ${shard}_final_dp.txt
-awk '1' header AD.txt  > ${shard}_final_ad.txt      
-    """
+awk '1' header DP.txt  > final_dp.txt
+awk '1' header AD.txt  > final_ad.txt
+"""
     outputs = {
         "samples": "samples.txt",
-        "tumor_allele_depth": "*_final_ad.txt",
-        "total_depth": "*_final_dp.txt"
+        "tumor_allele_depth": "final_ad.txt",
+        "total_depth": "final_dp.txt"
     }
     docker = samtools_docker
