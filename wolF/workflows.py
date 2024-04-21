@@ -16,8 +16,8 @@ def forcecall_mafs(mafs,
         "mafs": [mafs], "n_var": n_var, "n_max": n_max
     })
     piles = MpileupBams(inputs={
-        "bams": [[bams]],
-        "samples": [[samples]],
+        "bams": [bams],
+        "samples": [samples],
         "fasta": ref_disk["fasta"],
         "fasta_index": ref_disk["fasta_index"],
         "fasta_dict": ref_disk["fasta_dict"],
