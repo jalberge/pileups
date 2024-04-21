@@ -36,6 +36,7 @@ class MpileupBams(wolf.Task):
     name = "MpileupBams"
     inputs = {
         "bams": None,
+        "bais": None,
         "samples": None,
         "fasta": None,
         "fasta_index": None,
@@ -47,6 +48,9 @@ class MpileupBams(wolf.Task):
 export GCS_OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
 
 set -euxo pipefail
+
+# ln -s indexes from common > inputs > workspace
+for x in $(cat $bais); do ln -s $x . ; done
 
 shard=$(basename $variants_txt .txt)
 

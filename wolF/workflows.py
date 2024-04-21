@@ -5,6 +5,7 @@ from .tasks import *
 
 def forcecall_mafs(mafs,
                    bams,
+                   bais,
                    samples,
                    n_var=250,
                    n_max=0,
@@ -23,6 +24,7 @@ def forcecall_mafs(mafs,
     })
     piles = MpileupBams(inputs={
         "bams": [bams],
+        "bais": [bais],
         "samples": [samples],
         "fasta": ref_disk["fasta"],
         "fasta_index": ref_disk["fasta_index"],
