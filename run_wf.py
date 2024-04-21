@@ -24,6 +24,11 @@ PS = PS.loc[ (PS.participant == "PANGEA_4468") & (PS.type_T == "bioskryb")]
 with wolf.Workflow(workflow=forcecall_mafs,
                    scheduler_processes=4,
                    max_concurrent_flows=10,
+                   max_concurrent_flow_tasks = 500,
+                   common_task_opts = {
+                       "retry" : 5,
+                       "cleanup_job_workdir" : True
+                       }
                    ) as w:
     #for pair, p in PS.iterrows():
     w.run(RUN_NAME="mpileups_test",  # fill in run name
