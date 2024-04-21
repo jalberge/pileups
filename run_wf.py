@@ -30,6 +30,6 @@ with wolf.Workflow(workflow=forcecall_mafs,
           mafs=PS["mutation_validator_validated_maf_WGS"].tolist(),
           bams=PS["hg38_analysis_ready_bam_T"].tolist(),
           samples=PS.index.tolist(),
-          n_max=500,
+          n_max=5,
           n_var=1
           )
