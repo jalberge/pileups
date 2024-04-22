@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # method name
-METHOD_NAME=method_name_goes_here
+METHOD_NAME=samtools
+
+# samtools version
+VERSION=${1:-1.20}
+echo VERSION=$VERSION
 
 # docker build parameters (most likely, the defaults are OK)
-EXTRA_DOCKER_BUILD_ARGS=""
+EXTRA_DOCKER_BUILD_ARGS="--build-arg VERSION=${VERSION}"
 DOCKER_BUILD_PATH="."
 
 #
@@ -20,7 +24,7 @@ if [[ $BRANCH == "master" ]]; then
 else
 	BRANCH+="_"
 fi
-VERSION=${BRANCH}v${NCOMMIT}
+VERSION=${BRANCH}${VERSION}
 
 # build method docker
 docker build -t getzlab/$METHOD_NAME:${VERSION} ${EXTRA_DOCKER_BUILD_ARGS} ${DOCKER_BUILD_PATH}
