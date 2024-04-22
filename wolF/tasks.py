@@ -105,7 +105,8 @@ bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%AD{1}\t]' concat_0000.vcf > AD.tx
 bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%DP\t]' concat_0000.vcf > DP.txt
 bcftools query -l concat_0000.vcf > samples.txt
 
-cat samples.txt | tr "\n" "\t" > header
+# rm last tab created by pivot
+cat samples.txt | tr "\n" "\t" | sed 's/\t$//' > header
 
 awk '1' header DP.txt  > final_dp.txt
 awk '1' header AD.txt  > final_ad.txt
