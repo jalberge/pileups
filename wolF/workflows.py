@@ -16,6 +16,7 @@ def forcecall_mafs(mafs,
                    bucket=None,
                    _debug=False
                    ):
+
     @prefect.task
     def sort(x):
         return sorted(x)
@@ -24,7 +25,7 @@ def forcecall_mafs(mafs,
     def atleast1d(x):
         return [x] if (not isinstance(x, list)) and x is not None else x
    
-   if localize_bams_to_disks:
+    if localize_bams_to_disks:
         local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais})
         bams = local_bams["bam"]
         bais = local_bams["bai"]
