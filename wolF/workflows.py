@@ -13,7 +13,8 @@ def forcecall_mafs(mafs,
                    fasta_index="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai",
                    fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
                    localize_bams_to_disks=False,
-                   bucket=None
+                   bucket=None,
+                   _debug=False
                    ):
     @prefect.task
     def sort(x):
@@ -37,8 +38,17 @@ def forcecall_mafs(mafs,
         "variants_txt": sort(variants_lists["variants"])
     }, overrides = {"bams": "string"} if not localize_bams_to_disks else {})
     ad_dp_matrices = ConcatVcfsToMatrix(inputs={"isec_vcfs": [piles["isec_vcf"]]})
+    if localize_bams_to_disks and not _debug:
+        wolf.localization.DeleteDisk(
+          name = "DeleteBams",
+          inputs = {
+            "disk" : local_bams["bam"],
+            "upstream" : ad_dp_matrices["total_depth"]
+          },
+          mapped = True
+        )
     if bucket is not None:
         wolf.UploadToBucket(
-            files=[ad_dp_matrices["tumor_allele_depth"], ad_dp_matrices["total_depth"]],
+            files=[ad_dp_matrices["tumor_allele_depth"], ad_dp_matrices["total_depth"], ad_dp_matrices["samples"]],
             bucket=bucket
         )

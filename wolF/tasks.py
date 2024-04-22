@@ -1,6 +1,6 @@
 import wolf
 
-samtools_docker = "jbalberge/samtools_cloud:1.20"
+samtools_docker = "gcr.io/broad-getzlab-workflows/samtools@sha256:8074df347e20ca7f39646914eb9fcccde30a9ca85d4dd10b60fe99d5b78a223d"
 
 
 class Maf2VcfPositions(wolf.Task):
