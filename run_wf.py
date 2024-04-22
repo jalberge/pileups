@@ -19,7 +19,6 @@ PS = P.merge(S, left_index=True, right_index=True)
 
 PS = PS.loc[ (PS.participant == "PANGEA_4468") & (PS.type_T == "bioskryb")]
 
-PS = PS.iloc[0:3]
 # S = S.loc[S.index.str.startswith('Ultra')]
 
 with wolf.Workflow(workflow=forcecall_mafs,
@@ -38,6 +37,6 @@ with wolf.Workflow(workflow=forcecall_mafs,
           bais=PS["hg38_analysis_ready_bam_index_T"].tolist(),
           samples=PS.index.tolist(),
           localize_bams_to_disks=True,
-          n_max=10,
-          n_var=2
+          n_max=0,
+          n_var=250
           )
