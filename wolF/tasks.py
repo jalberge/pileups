@@ -105,8 +105,8 @@ class ConcatVcfsToMatrix(wolf.Task):
 bcftools concat -f $isec_vcfs -o concat_0000.vcf
 
     # query to transform VCF to MTX
-bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%AD{1}\t]' concat_0000.vcf > AD.txt
-bcftools query -f '%CHROM\_%POS\_%REF\_%ALT\t[%DP\t]' concat_0000.vcf > DP.txt
+bcftools query -f '%CHROM\_%POS\_%REF\_%ALT[\t%AD{1}]' concat_0000.vcf > AD.txt
+bcftools query -f '%CHROM\_%POS\_%REF\_%ALT[\t%DP]' concat_0000.vcf > DP.txt
 bcftools query -l concat_0000.vcf > samples.txt
 
 # rm last tab created by pivot
