@@ -40,7 +40,7 @@ with wolf.Workflow(workflow=forcecall_mafs,
     for PARTICIPANT in PARTICIPANTS:
         rows=PS[PS.participant==PARTICIPANT]
         w.run(RUN_NAME="pileups_maf_"+PARTICIPANT,  # fill in run name
-              mafs=rows["mutation_validator_validated_maf_WGS"].tolist(),
+            mafs=rows["mutation_validator_validated_maf_WGS"].tolist(),
             bams=rows["hg38_analysis_ready_bam_T"].tolist(),
             bais=rows["hg38_analysis_ready_bam_index_T"].tolist(),
             samples=rows.index.tolist(),
