@@ -43,7 +43,7 @@ class MpileupBams(wolf.Task):
         "fasta_dict": None,
         "variants_txt": None
     }
-    overrides = {"bams": "string"}
+    #overrides = {"bams": "string"}
     script = """
 export GCS_OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
 
@@ -68,9 +68,13 @@ cut -f1,2 $variants_txt > positions.txt
 # convert file to list of bams
 bam_list=$(cat $bams | tr "\n" " ")
 
+# create sample map
+paste -d" " $bams $samples > sample_map
+
 # mpileup depth and t_alt_count
 # norm to split multi allele
 bcftools mpileup -a FORMAT/AD,FORMAT/DP -A -d 30 -R positions.txt --ignore-RG -I -f $fasta $bam_list | \
+    bcftools reheader -s sample_map | \
     bcftools norm -m - --write-index -o bcfpiles.vcf.gz
 # isec to intersect with master list of variants (keep only ALT allele and exclude *)
 bcftools isec -c none -p . -n=2 -w1  bcfpiles.vcf.gz variants.vcf.gz

@@ -21,8 +21,8 @@ def forcecall_mafs(mafs,
 
     if localize_bams_to_disks:
         local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais})
-        bams = local_bams["bams"]
-        bais = local_bams["bais"]
+        bams = local_bams["bam"]
+        bais = local_bams["bai"]
     ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
     variants_lists = Maf2VcfPositions(inputs={
         "mafs": [mafs], "n_var": n_var, "n_max": n_max
@@ -35,7 +35,7 @@ def forcecall_mafs(mafs,
         "fasta_index": ref_disk["fasta_index"],
         "fasta_dict": ref_disk["fasta_dict"],
         "variants_txt": sort(variants_lists["variants"])
-    })
+    }, overrides = {"bams": "string"} if not localize_bams_to_disks else {})
     ad_dp_matrices = ConcatVcfsToMatrix(inputs={"isec_vcfs": [piles["isec_vcf"]]})
     if bucket is not None:
         wolf.UploadToBucket(

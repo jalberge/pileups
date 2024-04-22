@@ -37,7 +37,7 @@ with wolf.Workflow(workflow=forcecall_mafs,
           bams=PS["hg38_analysis_ready_bam_T"].tolist(),
           bais=PS["hg38_analysis_ready_bam_index_T"].tolist(),
           samples=PS.index.tolist(),
-          localize_bams_to_disks=False,
+          localize_bams_to_disks=True,
           n_max=10,
           n_var=2
           )
