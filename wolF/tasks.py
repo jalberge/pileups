@@ -43,7 +43,7 @@ class MpileupBams(wolf.Task):
         "fasta_dict": None,
         "variants_txt": None
     }
-    overrides = { "bams": "string" }
+    overrides = {"bams": "string"}
     script = """
 export GCS_OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
 
@@ -85,7 +85,7 @@ rm *.bai
         "isec_vcf": "*_isec.vcf"
     }
     docker = samtools_docker
-    #resources = {"mem": "8G"}  # mpileup 1.20 is not really parallelized. just compression vcf.
+    # resources = {"mem": "8G"}  # mpileup 1.20 is not really parallelized. just compression vcf.
 
 
 # define additional tasks in the same way that task1 is defined above.

@@ -12,12 +12,17 @@ def forcecall_mafs(mafs,
                    fasta="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta",
                    fasta_index="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai",
                    fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
+                   localize_bams_to_disks=False,
                    bucket=None
                    ):
     @prefect.task
     def sort(x):
         return sorted(x)
 
+    if localize_bams_to_disks:
+        local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais})
+        bams = local_bams["bams"]
+        bais = local_bams["bais"]
     ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
     variants_lists = Maf2VcfPositions(inputs={
         "mafs": [mafs], "n_var": n_var, "n_max": n_max
