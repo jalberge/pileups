@@ -73,7 +73,7 @@ paste -d" " $bams $samples > sample_map
 
 # mpileup depth and t_alt_count
 # norm to split multi allele
-bcftools mpileup -a FORMAT/AD,FORMAT/DP -A -d 30 -R positions.txt --ignore-RG -I -f $fasta $bam_list | \
+bcftools mpileup -a FORMAT/AD,FORMAT/DP -A -d 100 -R positions.txt --ignore-RG -I -f $fasta $bam_list | \
     bcftools reheader -s sample_map | \
     bcftools norm -m - --write-index -o bcfpiles.vcf.gz
 # isec to intersect with master list of variants (keep only ALT allele and exclude *)
