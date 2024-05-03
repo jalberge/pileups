@@ -42,7 +42,8 @@ def forcecall_mafs(mafs,
         "fasta": ref_disk["fasta"],
         "fasta_index": ref_disk["fasta_index"],
         "fasta_dict": ref_disk["fasta_dict"],
-        "variants_txt": sort(atleast1d(variants_lists["variants"]))
+        "variants_txt": sort(atleast1d(variants_lists["variants"])),
+        "isec_collapse_mode": "none"  # exact ALT match
     }, overrides={"bams": "string"} if not localize_bams_to_disks else {})
 
     ad_dp_matrices = ConcatVcfsToMatrix(inputs={"isec_vcfs": [piles["isec_vcf"]]})
@@ -103,7 +104,8 @@ def coverage_interval_list(interval_list,
         "fasta": ref_disk["fasta"],
         "fasta_index": ref_disk["fasta_index"],
         "fasta_dict": ref_disk["fasta_dict"],
-        "variants_txt": sort(atleast1d(variants_lists["variants"]))
+        "variants_txt": sort(atleast1d(variants_lists["variants"])),
+        "isec_collapse_mode": "all"  # don't need ALT match
     }, overrides={"bams": "string"} if not localize_bams_to_disks else {})
 
     ad_dp_matrices = ConcatVcfsToMatrix(inputs={"isec_vcfs": [piles["isec_vcf"]]})

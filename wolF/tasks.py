@@ -67,7 +67,8 @@ class MpileupBams(wolf.Task):
         "fasta": None,
         "fasta_index": None,
         "fasta_dict": None,
-        "variants_txt": None
+        "variants_txt": None,
+        "isec_collapse_mode": "none"  # by default don't collapse variants, might use 'all' for pure coverage / no AD
     }
     # overrides = {"bams": "string"}
     script = """
@@ -103,7 +104,7 @@ bcftools mpileup -a FORMAT/AD,FORMAT/DP -A -d 100 -R positions.txt --ignore-RG -
     bcftools reheader -s sample_map | \
     bcftools norm -m - --write-index -o bcfpiles.vcf.gz
 # isec to intersect with master list of variants (keep only ALT allele and exclude *)
-bcftools isec -c none -p . -n=2 -w1  bcfpiles.vcf.gz variants.vcf.gz
+bcftools isec -c ${isec_collapse_mode} -p . -n=2 -w1  bcfpiles.vcf.gz variants.vcf.gz
 
 mv 0000.vcf ${shard}_isec.vcf
 
