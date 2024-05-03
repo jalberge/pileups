@@ -20,7 +20,7 @@ with wolf.Workflow(workflow=coverage_interval_list,
                    max_concurrent_flow_tasks=500,
                    common_task_opts={
                        "retry": 5,
-                       "cleanup_job_workdir": True
+                       "cleanup_job_workdir": False
                    }
                    ) as w:
         w.run(RUN_NAME="cov_haplotype_db",  # fill in run name
@@ -31,5 +31,6 @@ with wolf.Workflow(workflow=coverage_interval_list,
               localize_bams_to_disks=True,
               n_max=100,
               n_var=25,
-              bucket=bucket
+              bucket=bucket,
+              _debug=True
               )
