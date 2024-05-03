@@ -1,6 +1,7 @@
 import wolf
 
-samtools_docker = "gcr.io/broad-getzlab-workflows/samtools@sha256:8074df347e20ca7f39646914eb9fcccde30a9ca85d4dd10b60fe99d5b78a223d"
+samtools_docker = "gcr.io/broad-getzlab-workflows/samtools@sha256" \
+                  ":8074df347e20ca7f39646914eb9fcccde30a9ca85d4dd10b60fe99d5b78a223d "
 
 
 class Maf2VcfPositions(wolf.Task):
@@ -43,7 +44,7 @@ class MpileupBams(wolf.Task):
         "fasta_dict": None,
         "variants_txt": None
     }
-    #overrides = {"bams": "string"}
+    # overrides = {"bams": "string"}
     script = """
 export GCS_OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
 
