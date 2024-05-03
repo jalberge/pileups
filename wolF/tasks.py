@@ -4,6 +4,31 @@ samtools_docker = "gcr.io/broad-getzlab-workflows/samtools@sha256" \
                   ":8074df347e20ca7f39646914eb9fcccde30a9ca85d4dd10b60fe99d5b78a223d "
 
 
+class IntervalList2VcfPositions(wolf.Task):
+    name = "IntervalList2VcfPositions"
+    inputs = {"interval_list": None, "n_var": 250, "n_max": 0}
+    script = """
+    set -euxo pipefail
+    
+    # interval list has large header and rs ids + additional fields
+    
+    grep -E -v '^[@#]' $interval_list | \
+    cut -f 1,2,4,5 |\
+    awk -v OFS="\t" '$3 ~ /^[ACGT]$/ && $4 ~ /^[ACGT]$/' | \
+    sort -k1,2 -V | \
+    uniq > master
+    
+    if [[ $n_max -gt 0 ]]; then shuf -n $n_max master | sort -k1,2 -V > master_ && mv master_ master; fi
+
+    split -l $n_var -a 5 -d --additional-suffix=.txt master variants_
+    
+    """
+    outputs = {
+        "variants": "variants_*.txt",
+    }
+    docker = samtools_docker
+
+
 class Maf2VcfPositions(wolf.Task):
     name = "Maf2VcfPositions"
     inputs = {"mafs": None, "n_var": 250, "n_max": 0}

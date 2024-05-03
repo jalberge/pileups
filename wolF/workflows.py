@@ -62,3 +62,64 @@ def forcecall_mafs(mafs,
             files=[ad_dp_matrices["tumor_allele_depth"], ad_dp_matrices["total_depth"], ad_dp_matrices["samples"]],
             bucket=bucket
         )
+
+
+def coverage_interval_list(interval_list,
+                           bams,
+                           bais,
+                           samples,
+                           n_var=250,
+                           n_max=0,
+                           fasta="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta",
+                           fasta_index="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai",
+                           fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
+                           localize_bams_to_disks=False,
+                           bucket=None,
+                           _debug=False
+                           ):
+    @prefect.task
+    def sort(x):
+        return sorted(x)
+
+    @prefect.task
+    def atleast1d(x):
+        return [x] if (not isinstance(x, list)) and x is not None else x
+
+    if localize_bams_to_disks:
+        local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais})
+        bams = local_bams["bam"]
+        bais = local_bams["bai"]
+
+    ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
+
+    variants_lists = IntervalList2VcfPositions(inputs={
+        "interval_list": [interval_list], "n_var": n_var, "n_max": n_max
+    })
+
+    piles = MpileupBams(inputs={
+        "bams": [bams],
+        "bais": [bais],
+        "samples": [samples],
+        "fasta": ref_disk["fasta"],
+        "fasta_index": ref_disk["fasta_index"],
+        "fasta_dict": ref_disk["fasta_dict"],
+        "variants_txt": sort(atleast1d(variants_lists["variants"]))
+    }, overrides={"bams": "string"} if not localize_bams_to_disks else {})
+
+    ad_dp_matrices = ConcatVcfsToMatrix(inputs={"isec_vcfs": [piles["isec_vcf"]]})
+
+    if localize_bams_to_disks and not _debug:
+        wolf.localization.DeleteDisk(
+            name="DeleteBams",
+            inputs={
+                "disk": local_bams["bam"],
+                "upstream": ad_dp_matrices["total_depth"]
+            },
+            mapped=True
+        )
+
+    if bucket is not None:
+        wolf.UploadToBucket(
+            files=[ad_dp_matrices["tumor_allele_depth"], ad_dp_matrices["total_depth"], ad_dp_matrices["samples"]],
+            bucket=bucket
+        )
