@@ -15,6 +15,7 @@ def forcecall_mafs(mafs,
                    fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
                    localize_bams_to_disks=False,
                    bucket=None,
+                   project="dfci-ghobriallab-gcp",
                    workspace=None,
                    workspace_entity_name=None,
                    workspace_entity_type="participant",
@@ -29,7 +30,7 @@ def forcecall_mafs(mafs,
         return [x] if (not isinstance(x, list)) and x is not None else x
 
     if localize_bams_to_disks:
-        local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais})
+        local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais}, project=project)
         bams = local_bams["bam"]
         bais = local_bams["bai"]
 
