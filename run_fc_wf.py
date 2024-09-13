@@ -20,11 +20,13 @@ WIC = wolf.fc.WorkspaceInputConnector(WORKSPACE)
 P = WIC.pairs
 S = WIC.get_pairs_as_joint_samples()
 
-PARTICIPANTS = ["PANGEA_4468", "PANGEA_3522", "PANGEA_10704", "PANGEA_3542"]
+#PARTICIPANTS = ["PANGEA_4468", "PANGEA_3522", "PANGEA_10704", "PANGEA_3542"]
+PARTICIPANTS = ["PANGEA_4594", "PANGEA_889", "PANGEA_10547"]
 
 PS = P.merge(S, left_index=True, right_index=True)
 
-PS = PS.loc[(PS.participant.isin(PARTICIPANTS)) & (PS.type_T == "bioskryb") & ~terra_na(
+#PS = PS.loc[(PS.participant.isin(PARTICIPANTS)) & (PS.type_T == "bioskryb") & ~terra_na(
+PS = PS.loc[(PS.participant.isin(PARTICIPANTS)) & ~terra_na(
     PS.mutation_validator_validated_maf_WGS) & ~terra_na(PS.hg38_analysis_ready_bam_T)]
 
 # S = S.loc[S.index.str.startswith('Ultra')]

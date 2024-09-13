@@ -10,7 +10,7 @@ def terra_na(x):
     return y
 
 
-bucket = "gs://acc-genome-sphere/hg38-hapotype-coverage"
+bucket = "gs://acc-genome-sphere/hg38-map-coverage"
 
 bam_table = pd.read_table("fiveprime_bams.tsv", index_col="sample")
 
@@ -29,8 +29,8 @@ with wolf.Workflow(workflow=coverage_interval_list,
               bais=bam_table["bai"].tolist(),
               samples=bam_table.index.tolist(),
               localize_bams_to_disks=True,
-              n_max=100,
-              n_var=25,
+              n_max=0,
+              n_var=250,
               bucket=bucket,
               _debug=True
               )

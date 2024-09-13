@@ -3,6 +3,37 @@ import wolf
 samtools_docker = "gcr.io/broad-getzlab-workflows/samtools@sha256" \
                   ":8074df347e20ca7f39646914eb9fcccde30a9ca85d4dd10b60fe99d5b78a223d "
 
+class Position2Bed(wolf.Task):
+    name = "Position2Bed"
+    inputs={"txt":None}
+    script = """
+    set -euxo pipefail
+    out=$(basename $txt .txt)
+    grep -E -v '^[@#]' $txt | \
+    cut -f 1,2,3 | \
+    awk -v OFS="\t" '{ print $1,$2-1,$3 }' > "${out}.bed"
+    """
+    outputs = {"bed":"*.bed"}
+
+class SplitBed(wolf.Task):
+    name = "SplitBed"
+    inputs={"bed":None, "chunk_size":10000}
+    script="""
+    set -exuo pipefail
+    split -l ${chunk_size} -d -a 4 --additional-suffix '.bed' ${bed} split_shard
+    """
+    outputs={"bed" : "split_shard*" }
+
+class SamtoolsDepth(wolf.Task):
+    name = "SamtoolsDepth"
+    inputs={"bam":None, "bai":None,"name":None,"bed":None}
+    script="""
+    set -exuo pipefail
+    outname="${name}_${SLURM_ARRAY_TASK_ID}.tsv"
+    samtools depth -a -b ${bed} -s -J -o $outname ${bam}
+    """
+    outputs={"":"*.tsv"}
+    docker=samtools_docker
 
 class IntervalList2VcfPositions(wolf.Task):
     name = "IntervalList2VcfPositions"
