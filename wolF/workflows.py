@@ -76,7 +76,7 @@ def forcecall_mafs(mafs,
                 "mut_pileups_total_depth" : ad_dp_matrices["total_depth"],
                 "mut_pileups_samples" : ad_dp_matrices["samples"]
                 }
-        sync_task = wolf.fc.SyncToWorkspace(
+        wolf.fc.SyncToWorkspace(
                 nameworkspace = workspace,
                 entity_type = workspace_entity_type,
                 entity_name = workspace_entity_name,
