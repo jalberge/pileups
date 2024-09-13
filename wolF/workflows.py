@@ -7,6 +7,7 @@ def forcecall_mafs(mafs,
                    bams,
                    bais,
                    samples,
+                   participant="P",
                    n_var=250,
                    n_max=0,
                    fasta="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta",
@@ -14,6 +15,9 @@ def forcecall_mafs(mafs,
                    fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
                    localize_bams_to_disks=False,
                    bucket=None,
+                   workspace=None,
+                   workspace_entity_name=None,
+                   workspace_entity_type="participant",
                    _debug=False
                    ):
     @prefect.task
@@ -61,9 +65,23 @@ def forcecall_mafs(mafs,
     if bucket is not None:
         wolf.UploadToBucket(
             files=[ad_dp_matrices["tumor_allele_depth"], ad_dp_matrices["total_depth"], ad_dp_matrices["samples"]],
-            bucket=bucket
+            bucket=bucket+'/'+str(participant)
         )
 
+    if workspace is not None:
+        if workspace_entity_name is None:
+            workspace_entity_name = participant
+        attr_map = {
+                "mut_pileups_tumor_allele_depth" : ad_dp_matrices["tumor_allele_depth"],
+                "mut_pileups_total_depth" : ad_dp_matrices["total_depth"],
+                "mut_pileups_samples" : ad_dp_matrices["samples"]
+                }
+        sync_task = wolf.fc.SyncToWorkspace(
+                nameworkspace = workspace,
+                entity_type = workspace_entity_type,
+                entity_name = workspace_entity_name,
+                attr_map = attr_map
+        )
 
 def coverage_interval_list(interval_list,
                            bams,
