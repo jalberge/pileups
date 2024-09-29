@@ -205,7 +205,7 @@ class BcftoolsMpileupCallCloud(wolf.Task):
     
     set -euxo pipefail
     
-    bcftools mpileup -R ${regions} -f ${fasta} ${bam} | bcftools call -mA -Oz -o ${name}.${version}.calls.vcf.gz -Wtbi
+    bcftools mpileup -R ${regions} -f ${fasta} -Ou ${bam} | bcftools call -mA -Oz -o ${name}.${version}.calls.vcf.gz -Wtbi
     
     """
     outputs = {
