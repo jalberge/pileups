@@ -145,9 +145,12 @@ def coverage_interval_list(interval_list,
             bucket=bucket
         )
 
-def genotype_in_the_cloud(bam, bai,
-                          fasta, fasta_index, fasta_dict,
-                          name,
+def genotype_in_the_cloud(bam, bai, name,
+
+                          fasta="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta",
+                          fasta_index="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai",
+                          fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
+
                           bucket="gs://acc-genome-sphere/hg38-5prime-gt/",
                           version="hg38",
                           regions="gs://jba-utils/hg38_5prime_20240710_n_1913_positions_sorted.txt"):
