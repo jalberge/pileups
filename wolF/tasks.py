@@ -213,6 +213,7 @@ class BcftoolsMpileupCallCloud(wolf.Task):
         "vcf_gz_tbi": "*.calls.vcf.gz.tbi",
     }
     docker = samtools_docker
+    resources = {"mem": "32G"}
 
 class MergeVcfs(wolf.Task):
     name = "MergeVcfs"
