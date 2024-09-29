@@ -173,7 +173,7 @@ def genotype_in_the_cloud(bam, bai, name,
 
     if bucket is not None:
         wolf.UploadToBucket(
-            files=[ genotypes["vcf_gz"], genotypes["vcf_gz_index"]],
+            files=[ genotypes["vcf_gz"], genotypes["vcf_gz_tbi"]],
             bucket=bucket
         )
 
