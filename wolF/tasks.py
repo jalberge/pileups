@@ -179,3 +179,56 @@ awk '1' header AD.txt  > final_ad.txt
         "total_depth": "final_dp.txt"
     }
     docker = samtools_docker
+
+
+class BcftoolsMpileupCallCloud(wolf.Task):
+    name = "BcftoolsMpileupCallCloud"
+    inputs = {
+        "bam": None,
+        "bai": None,
+
+        "fasta": None,
+        "fasta_index": None,
+        "fasta_dict": None,
+        "version": "hg38",
+
+        "regions": None,
+
+        "name":None
+    }
+    overrides = {
+        "bam": "string",
+        "bai": "string"
+    }
+    script = """
+    export GCS_OAUTH_TOKEN=$(gcloud auth application-default print-access-token)
+    
+    set -euxo pipefail
+    
+    bcftools mpileup -R $regions -f $fasta $bam | bcftools call -mA -Oz -o {sample}.{version}.calls.vcf.gz -Wtbi
+    
+    """
+    outputs = {
+        "vcf_gz": "*.calls.vcf.gz",
+        "vcf_gz_tbi": "*.calls.vcf.gz.tbi",
+    }
+    docker = samtools_docker
+
+class MergeVcfs(wolf.Task):
+    name = "MergeVcfs"
+    inputs = {
+        "vcf_gz_list":None,
+        "vcf_gz_tbi_list":None,
+        "sample_set":None, # force users to give a name for the set of samples
+        "version": "hg38"
+    }
+    script = """
+    
+    bcftools merge -l $vcf_gz_list -m all -Oz -o ${sample_set}.{version}.vcf.gz -Wtbi
+    
+    """
+    outputs = {
+        "vcf_gz": "*.vcf.gz",
+        "vcf_gz_tbi": "*.vcf.gz.tbi"
+    }
+    docker = samtools_docker

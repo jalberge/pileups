@@ -144,3 +144,46 @@ def coverage_interval_list(interval_list,
             files=[ad_dp_matrices["tumor_allele_depth"], ad_dp_matrices["total_depth"], ad_dp_matrices["samples"]],
             bucket=bucket
         )
+
+def genotype_in_the_cloud(bam, bai,
+                          fasta, fasta_index, fasta_dict,
+                          name,
+                          bucket="gs://acc-genome-sphere/hg38-5prime-gt/",
+                          version="hg38",
+                          regions="gs://jba-utils/hg38_5prime_20240710_n_1913_positions_sorted.txt"):
+
+    ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
+
+    genotypes = BcftoolsMpileupCallCloud(inputs={
+
+        "bam":bam,"bai":bai,
+
+        "fasta":ref_disk["fasta"],
+        "fasta_index":ref_disk["fasta_index"],
+        "fasta_dict":ref_disk["fasta_dict"],
+
+        "regions": regions,
+        "version":version,
+
+        "name":name,
+    })
+
+    if bucket is not None:
+        wolf.UploadToBucket(
+            files=[ genotypes["vcf_gz"], genotypes["vcf_gz_index"]],
+            bucket=bucket
+        )
+
+def merge_genotypes(vcf_gz_list, vcf_gz_tbi_list, sample_set, bucket="gs://acc-genome-sphere/hg38-5prime-gt-merge/"):
+
+    merged_genotypes = MergeVcfs(inputs={
+        "vcf_gz_list": [vcf_gz_list],
+        "vcf_gz_tbi_list": [vcf_gz_tbi_list],
+        "sample_set": sample_set
+    })
+
+    if bucket is not None:
+        wolf.UploadToBucket(
+            files=[ genotypes["vcf_gz"], genotypes["vcf_gz_index"]],
+            bucket=bucket
+        )
