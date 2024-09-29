@@ -205,7 +205,7 @@ class BcftoolsMpileupCallCloud(wolf.Task):
     
     set -euxo pipefail
     
-    bcftools mpileup -R $regions -f $fasta $bam | bcftools call -mA -Oz -o {sample}.{version}.calls.vcf.gz -Wtbi
+    bcftools mpileup -R ${regions} -f ${fasta} ${bam} | bcftools call -mA -Oz -o ${name}.${version}.calls.vcf.gz -Wtbi
     
     """
     outputs = {
@@ -224,7 +224,7 @@ class MergeVcfs(wolf.Task):
     }
     script = """
     
-    bcftools merge -l $vcf_gz_list -m all -Oz -o ${sample_set}.{version}.vcf.gz -Wtbi
+    bcftools merge -l $vcf_gz_list -m all -Oz -o ${sample_set}.${version}.vcf.gz -Wtbi
     
     """
     outputs = {
