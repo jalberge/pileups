@@ -195,7 +195,8 @@ def genotype_in_the_cloud(bam, bai, name,
                 attr_map = attr_map
         )
 
-def merge_genotypes(vcf_gz_list, vcf_gz_tbi_list, sample_set, bucket="gs://acc-genome-sphere/hg38-5prime-gt-merge/"):
+def merge_genotypes(vcf_gz_list, vcf_gz_tbi_list, sample_set, bucket="gs://acc-genome-sphere/hg38-5prime-gt-merge/",
+                    workspace=None, workspace_entity_name=None, workspace_entity_type="sample_set"):
 
     merged_genotypes = MergeVcfs(inputs={
         "vcf_gz_list": [vcf_gz_list],
@@ -207,4 +208,18 @@ def merge_genotypes(vcf_gz_list, vcf_gz_tbi_list, sample_set, bucket="gs://acc-g
         wolf.UploadToBucket(
             files=[ genotypes["vcf_gz"], genotypes["vcf_gz_index"]],
             bucket=bucket
+        )
+
+    if workspace is not None:
+        if workspace_entity_name is None:
+            workspace_entity_name = sample_set
+        attr_map = {
+            "merged_genotypes_vcf_gz": merged_genotypes["vcf_gz"],
+            "merged_genotypes_vcf_gz_tbi": merged_genotypes["vcf_gz_tbi"],
+        }
+        wolf.fc.SyncToWorkspace(
+            nameworkspace=workspace,
+            entity_type=workspace_entity_type,
+            entity_name=workspace_entity_name,
+            attr_map=attr_map
         )
