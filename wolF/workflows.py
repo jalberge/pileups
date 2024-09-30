@@ -153,7 +153,11 @@ def genotype_in_the_cloud(bam, bai, name,
 
                           bucket="gs://acc-genome-sphere/hg38-5prime-gt/",
                           version="hg38",
-                          regions="gs://jba-utils/hg38_5prime_20240710_n_1913_positions_sorted.txt"):
+                          regions="gs://jba-utils/hg38_5prime_20240710_n_1913_positions_sorted.txt",
+
+                          workspace = None,
+                          workspace_entity_name=None,
+                          workspace_entity_type="sample"):
 
     ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
 
@@ -175,6 +179,20 @@ def genotype_in_the_cloud(bam, bai, name,
         wolf.UploadToBucket(
             files=[ genotypes["vcf_gz"], genotypes["vcf_gz_tbi"]],
             bucket=bucket
+        )
+
+    if workspace is not None:
+        if workspace_entity_name is None:
+            workspace_entity_name = name
+        attr_map = {
+                "fingerprints_fiveprime_vcf_gz" : genotypes["vcf_gz"],
+                "fingerprints_fiveprime_vcf_gz_tbi" : genotypes["vcf_gz_tbi"],
+                }
+        wolf.fc.SyncToWorkspace(
+                nameworkspace = workspace,
+                entity_type = workspace_entity_type,
+                entity_name = workspace_entity_name,
+                attr_map = attr_map
         )
 
 def merge_genotypes(vcf_gz_list, vcf_gz_tbi_list, sample_set, bucket="gs://acc-genome-sphere/hg38-5prime-gt-merge/"):
