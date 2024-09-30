@@ -208,7 +208,7 @@ def merge_genotypes(vcf_gz_list, vcf_gz_tbi_list, sample_set, bucket=None,
 
     if bucket is not None:
         wolf.UploadToBucket(
-            files=[ merged_genotypes["vcf_gz"], merged_genotypes["vcf_gz_index"]],
+            files=[ merged_genotypes["vcf_gz"], merged_genotypes["vcf_gz_tbi"]],
             bucket=bucket
         )
 
