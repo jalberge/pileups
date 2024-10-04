@@ -265,7 +265,7 @@ class LiftOver(wolf.Task):
         R=${liftover_target_fasta}
     
     # gatk4_docker has bcftools
-    bgzip ${sample}.${to_reference}.lifted_over.vcf -o ${sample}.${to_reference}.lifted_over.vcf.gz
+    bgzip -c ${sample}.${to_reference}.lifted_over.vcf > ${sample}.${to_reference}.lifted_over.vcf.gz
     tabix -p vcf ${sample}.${to_reference}.lifted_over.vcf.gz
         
     """
