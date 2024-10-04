@@ -262,7 +262,7 @@ class LiftOver(wolf.Task):
         O=${sample}.${to_reference}.lifted_over.vcf \
         CHAIN=${chain} \
         REJECT=${sample}.${to_reference}.rejected_variants.vcf \
-        R=${fasta}
+        R=${liftover_target_fasta}
     
     # gatk4_docker has bcftools
     bgzip ${sample}.${to_reference}.lifted_over.vcf -o ${sample}.${to_reference}.lifted_over.vcf.gz
