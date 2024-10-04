@@ -3,6 +3,8 @@ import wolf
 samtools_docker = "gcr.io/broad-getzlab-workflows/samtools@sha256" \
                   ":8074df347e20ca7f39646914eb9fcccde30a9ca85d4dd10b60fe99d5b78a223d "
 
+gatk4_docker = "gcr.io/broad-getzlab-workflows/gatk4_wolf:v22"
+
 class Position2Bed(wolf.Task):
     name = "Position2Bed"
     inputs={"txt":None}
@@ -233,3 +235,41 @@ class MergeVcfs(wolf.Task):
         "vcf_gz_tbi": "*.vcf.gz.tbi"
     }
     docker = samtools_docker
+
+class LiftOver(wolf.Task):
+    name = "LiftOver"
+    inputs = {
+        "vcf_gz": None,
+        "vcf_gz_tbi": None,
+
+        "sample": None,
+
+        "fasta": None,
+        "fasta_index": None,
+        "fasta_dict": None,
+
+        "to_reference": "hg38",
+
+        "chain": "gs://jba-utils/hg19ToHg38.over.chain",
+
+    }
+    script = """
+    
+    gatk LiftoverVcf \
+        I=${vcf_gz} \
+        O=${sample}.${to_reference}.lifted_over.vcf \
+        CHAIN=${chain} \
+        REJECT=${sample}.${to_reference}.rejected_variants.vcf \
+        R=${fasta}
+    
+    # gatk4_docker has bcftools
+    bgzip ${sample}.${to_reference}.lifted_over.vcf -o ${sample}.${to_reference}.lifted_over.vcf.gz
+    tabix -p vcf ${sample}.${to_reference}.lifted_over.vcf.gz
+        
+    """
+    outputs = {
+        "output_vcf_gz": "lifted_over.vcf.gz",
+        "output_vcf_gz_tbi": "lifted_over.vcf.gz.tbi",
+        "rejected": "rejected_variants.vcf"
+    }
+    docker = gatk4_docker

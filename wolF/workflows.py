@@ -155,10 +155,15 @@ def genotype_in_the_cloud(bam, bai, name,
                           version="hg38",
                           regions="gs://jba-utils/hg38_5prime_20240710_n_1913_positions_sorted.txt",
 
+                          liftover=False,
+                          liftover_chain="gs://jba-utils/hg19ToHg38.over.chain",
+                          liftover_to_reference="hg38",
+
                           workspace = None,
                           workspace_entity_name=None,
                           workspace_entity_type="sample"):
 
+    global lifted_over_genotypes
     ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
 
     genotypes = BcftoolsMpileupCallCloud(inputs={
@@ -175,9 +180,26 @@ def genotype_in_the_cloud(bam, bai, name,
         "name":name,
     })
 
+    if liftover:
+        lifted_over_genotypes = LiftOver(inputs={
+            "vcf_gz": genotypes["vcf_gz"],
+            "vcf_gz_tbi": genotypes["vcf_gz_tbi"],
+
+            "sample": name,
+
+            "fasta": ref_disk["fasta"],
+            "fasta_index": ref_disk["fasta_index"],
+            "fasta_dict": ref_disk["fasta_dict"],
+
+            "to_reference": liftover_to_reference,
+
+            "chain": liftover_chain,
+        })
+
     if bucket is not None:
         wolf.UploadToBucket(
-            files=[ genotypes["vcf_gz"], genotypes["vcf_gz_tbi"]],
+            files=[ genotypes["vcf_gz"] if not liftover else lifted_over_genotypes["vcf_gz"],
+                    genotypes["vcf_gz_tbi"] if not liftover else lifted_over_genotypes["vcf_gz_tbi"]],
             bucket=bucket
         )
 
@@ -185,8 +207,8 @@ def genotype_in_the_cloud(bam, bai, name,
         if workspace_entity_name is None:
             workspace_entity_name = name
         attr_map = {
-                "fingerprints_fiveprime_vcf_gz" : genotypes["vcf_gz"],
-                "fingerprints_fiveprime_vcf_gz_tbi" : genotypes["vcf_gz_tbi"],
+                "fingerprints_fiveprime_vcf_gz" : genotypes["vcf_gz"] if not liftover else lifted_over_genotypes["vcf_gz"],
+                "fingerprints_fiveprime_vcf_gz_tbi" : genotypes["vcf_gz_tbi"] if not liftover else lifted_over_genotypes["vcf_gz_tbi"],
                 }
         wolf.fc.SyncToWorkspace(
                 nameworkspace = workspace,
