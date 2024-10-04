@@ -156,7 +156,7 @@ def genotype_in_the_cloud(bam, bai, name,
                           regions="gs://jba-utils/hg38_5prime_20240710_n_1913_positions_sorted.txt",
 
                           liftover=False,
-                          liftover_chain="gs://jba-utils/hg19ToHg38.over.chain",
+                          liftover_chain="gs://jba-utils/b37ToHg38.over.chain",
                           liftover_to_reference="hg38",
                           liftover_target_fasta="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta",
                           liftover_target_fasta_index="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai",

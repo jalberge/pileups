@@ -250,7 +250,7 @@ class LiftOver(wolf.Task):
 
         "to_reference": "hg38",
 
-        "chain": "gs://jba-utils/hg19ToHg38.over.chain",
+        "chain": "gs://jba-utils/b37ToHg38.over.chain",
 
     }
     script = """
