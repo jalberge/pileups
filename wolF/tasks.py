@@ -270,8 +270,8 @@ class LiftOver(wolf.Task):
         
     """
     outputs = {
-        "output_vcf_gz": "lifted_over.vcf.gz",
-        "output_vcf_gz_tbi": "lifted_over.vcf.gz.tbi",
+        "vcf_gz": "lifted_over.vcf.gz",
+        "vcf_gz_tbi": "lifted_over.vcf.gz.tbi",
         "rejected": "rejected_variants.vcf"
     }
     docker = gatk4_docker
