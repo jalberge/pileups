@@ -255,6 +255,8 @@ class LiftOver(wolf.Task):
     }
     script = """
     
+    set -euxo pipefail
+    
     gatk LiftoverVcf \
         I=${vcf_gz} \
         O=${sample}.${to_reference}.lifted_over.vcf \
@@ -273,3 +275,4 @@ class LiftOver(wolf.Task):
         "rejected": "rejected_variants.vcf"
     }
     docker = gatk4_docker
+    resources = {"mem": "8G"}
