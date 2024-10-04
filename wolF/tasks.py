@@ -257,7 +257,7 @@ class LiftOver(wolf.Task):
     
     set -euxo pipefail
     
-    gatk LiftoverVcf \
+    gatk -Xmx7G LiftoverVcf \
         I=${vcf_gz} \
         O=${sample}.${to_reference}.lifted_over.vcf \
         CHAIN=${chain} \
