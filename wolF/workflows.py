@@ -158,6 +158,9 @@ def genotype_in_the_cloud(bam, bai, name,
                           liftover=False,
                           liftover_chain="gs://jba-utils/hg19ToHg38.over.chain",
                           liftover_to_reference="hg38",
+                          liftover_target_fasta="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta",
+                          liftover_target_fasta_index="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai",
+                          liftover_target_fasta_dict="gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
 
                           workspace = None,
                           workspace_entity_name=None,
@@ -181,15 +184,16 @@ def genotype_in_the_cloud(bam, bai, name,
     })
 
     if liftover:
+        target_ref_disk=wolf.LocalizeToDisk(files={"fasta": liftover_target_fasta, "fasta_index": liftover_target_fasta_index, "fasta_dict": liftover_target_fasta_dict})
         lifted_over_genotypes = LiftOver(inputs={
             "vcf_gz": genotypes["vcf_gz"],
             "vcf_gz_tbi": genotypes["vcf_gz_tbi"],
 
             "sample": name,
 
-            "fasta": ref_disk["fasta"],
-            "fasta_index": ref_disk["fasta_index"],
-            "fasta_dict": ref_disk["fasta_dict"],
+            "liftover_target_fasta": target_ref_disk["fasta"],
+            "liftover_target_fasta_index": target_ref_disk["fasta_index"],
+            "liftover_target_fasta_dict": target_ref_disk["fasta_dict"],
 
             "to_reference": liftover_to_reference,
 
