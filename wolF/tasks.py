@@ -257,7 +257,7 @@ class LiftOver(wolf.Task):
     
     set -euxo pipefail
     
-    gatk -Xmx7G LiftoverVcf \
+    gatk --java-options "-Xmx7500m" LiftoverVcf \
         I=${vcf_gz} \
         O=${sample}.${to_reference}.lifted_over.vcf \
         CHAIN=${chain} \
