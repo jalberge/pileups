@@ -244,9 +244,9 @@ class LiftOver(wolf.Task):
 
         "sample": None,
 
-        "fasta": None,
-        "fasta_index": None,
-        "fasta_dict": None,
+        "liftover_target_fasta": None,
+        "liftover_target_fasta_index": None,
+        "liftover_target_fasta_dict": None,
 
         "to_reference": "hg38",
 
