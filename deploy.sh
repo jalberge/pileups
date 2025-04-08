@@ -4,7 +4,7 @@
 METHOD_NAME=samtools
 
 # samtools version
-VERSION=${1:-1.20}
+VERSION=${1:-1.21}
 echo VERSION=$VERSION
 
 # docker build parameters (most likely, the defaults are OK)

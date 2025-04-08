@@ -1,6 +1,6 @@
 FROM gcr.io/broad-getzlab-workflows/base_image:v0.0.6
 
-ARG VERSION=1.20
+ARG VERSION=1.21
 WORKDIR /usr/bin
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
