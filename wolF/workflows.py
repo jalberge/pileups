@@ -30,9 +30,9 @@ def forcecall_mafs(mafs,
         return [x] if (not isinstance(x, list)) and x is not None else x
 
     if localize_bams_to_disks:
-        local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais}, project=project)
-        bams = local_bams["bam"]
-        bais = local_bams["bai"]
+        local_bams = wolf.LocalizeToDisk(files={"t_bam": bams, "t_bai": bais}, project=project)
+        bams = local_bams["t_bam"]
+        bais = local_bams["t_bai"]
 
     ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
 
@@ -57,7 +57,7 @@ def forcecall_mafs(mafs,
         wolf.localization.DeleteDisk(
             name="DeleteBams",
             inputs={
-                "disk": local_bams["bam"],
+                "disk": local_bams["t_bam"],
                 "upstream": ad_dp_matrices["total_depth"]
             },
             mapped=True
@@ -106,9 +106,9 @@ def coverage_interval_list(interval_list,
         return [x] if (not isinstance(x, list)) and x is not None else x
 
     if localize_bams_to_disks:
-        local_bams = wolf.LocalizeToDisk(files={"bam": bams, "bai": bais})
-        bams = local_bams["bam"]
-        bais = local_bams["bai"]
+        local_bams = wolf.LocalizeToDisk(files={"t_bam": bams, "t_bai": bais})
+        bams = local_bams["t_bam"]
+        bais = local_bams["t_bai"]
 
     ref_disk = wolf.LocalizeToDisk(files={"fasta": fasta, "fasta_index": fasta_index, "fasta_dict": fasta_dict})
 
@@ -133,7 +133,7 @@ def coverage_interval_list(interval_list,
         wolf.localization.DeleteDisk(
             name="DeleteBams",
             inputs={
-                "disk": local_bams["bam"],
+                "disk": local_bams["t_bam"],
                 "upstream": ad_dp_matrices["total_depth"]
             },
             mapped=True
